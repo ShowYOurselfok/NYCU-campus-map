@@ -17,7 +17,7 @@
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; }
         
-        /* 【關鍵核心】同屏畫面：上層 2D 地圖，下層 AR 相機 */
+        /* 同屏畫面：上層 2D 地圖，下層 AR 相機 */
         #main-container {
             display: flex;
             flex-direction: column;
@@ -25,7 +25,7 @@
             height: 100vh;
         }
 
-        /* 2D 地圖區（佔畫面上半部 50%） */
+        /* 2D 地圖區 */
         #map { 
             width: 100%; 
             height: 50%; 
@@ -34,7 +34,7 @@
             box-sizing: border-box;
         }
         
-        /* AR 實景相機區（佔畫面下半部 50%） */
+        /* AR 實景相機區 */
         #ar-view { 
             width: 100%; 
             height: 50%; 
@@ -42,15 +42,14 @@
             overflow: hidden;
         }
 
-        /* 讓 A-Frame 的 video 滿版填滿下半部容器 */
         .a-canvas { width: 100% !important; height: 100% !important; top: 0 !important; left: 0 !important; }
         video { width: 100% !important; height: 100% !important; object-fit: cover !important; }
         
-        /* 浮動控制按鈕區：放在畫面中右側，方便單手操作 */
+        /* 浮動控制按鈕區 */
         .control-panel {
             position: fixed;
             right: 15px;
-            top: calc(50% + 20px); /* 剛好在下半部相機畫面的右上角 */
+            top: calc(50% + 20px);
             z-index: 9999;
             display: flex;
             flex-direction: column;
@@ -75,7 +74,7 @@
         .action-btn:active { transform: scale(0.9); }
         .action-btn.secondary { background-color: rgba(40, 167, 69, 0.9); }
 
-        /* 圖例微調：移動到地圖區的右下角 */
+        /* 圖例微調 */
         .legend {
             position: absolute; bottom: 10px; right: 10px; z-index: 10;
             background: rgba(255,255,255,0.95); padding: 8px 12px; border-radius: 8px;
@@ -130,10 +129,10 @@
         <h4 style="margin: 0 0 8px 0; color: #ff4d4d; font-size: 14px;"><i class="fa-solid fa-triangle-exclamation"></i> 回報校園路況</h4>
         <p style="font-size: 11px; margin: 0 0 6px 0;">座標：<span id="coord-display" style="color: #666;"></span></p>
         <select id="obstacle-type" style="width: 100%; margin: 5px 0 8px 0; padding: 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 12px;">
-            <option value="施工圍籬">🚧 施工圍籬</option>
-            <option value="違停機車/車輛">🛵 違停機車/車輛</option>
-            <option value="路面凹陷/嚴重破損">⚠️ 路面凹陷破損</option>
-            <option value="電梯/鐵捲門故障">❌ 電梯/設施故障</option>
+            <option value="🚧 施工圍籬">🚧 施工圍籬</option>
+            <option value="🛵 違停機車/車輛">🛵 違停機車/車輛</option>
+            <option value="⚠️ 路面凹陷/嚴重破損">⚠️ 路面凹陷破損</option>
+            <option value="❌ 電梯/設施故障">❌ 電梯/設施故障</option>
         </select>
         <button id="submit-report" style="width: 100%; background: #ff4d4d; color: white; border: none; padding: 6px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">提交回報</button>
     </div>
@@ -150,24 +149,18 @@
 
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-        // ==========================================
-        // 【核心功能】在地圖上自動加上並追蹤「目前位置」的小藍點
-        // ==========================================
         const geolocate = new mapboxgl.GeolocateControl({
             positionOptions: { enableHighAccuracy: true },
-            trackUserLocation: true, // 自動持續追蹤使用者位置並更新地圖圓點
-            showUserHeading: true    // 顯示手機面向的視野箭頭扇形
+            trackUserLocation: true, 
+            showUserHeading: true    
         });
         map.addControl(geolocate, 'top-right');
 
-        // 當地圖初始化完成後，自動觸發定位，讓藍點顯示
         map.on('load', () => {
             geolocate.trigger();
         });
 
-        // ==========================================
-        // 原始普查採集路線數據定義
-        // ==========================================
+        // 原始普查採集路線數據
         const routeP = [
             { id: "起點", lng: 120.99743, lat: 24.78846, type: "起點", slope: 0, routeId: "P" },
             { id: "節點P01", lng: 120.99752, lat: 24.78847, type: "轉彎處", slope: 0, routeId: "P" },
@@ -184,7 +177,7 @@
             { id: "節點P12", lng: 120.99697, lat: 24.78546, type: "斜坡", slope: 10.51, routeId: "P" },
             { id: "節點P13", lng: 120.99685, lat: 24.78538, type: "斜坡", slope: 6.99, routeId: "P" },
             { id: "節點P14", lng: 120.99672, lat: 24.78415, type: "斜坡", slope: 10.51, routeId: "P" },
-            { id: "終點",   lng: 120.99671, lat: 24.78403, type: "斜坡/終點", slope: 10.51, routeId: "P" }
+            { id: "終點",    lng: 120.99671, lat: 24.78403, type: "斜坡/終點", slope: 10.51, routeId: "P" }
         ];
 
         const routeO = [
@@ -241,9 +234,7 @@
         const rawData = [...routeP, ...routeO, ...routeB];
 
         map.on('load', () => {
-            // ==========================================
-            // 功能一：畫出三條路線的虛線軌跡
-            // ==========================================
+            // 畫出虛線軌跡
             const featuresLine = [
                 { 'type': 'Feature', 'properties': { 'route': 'P' }, 'geometry': { 'type': 'LineString', 'coordinates': routeP.map(i => [i.lng, i.lat]) } },
                 { 'type': 'Feature', 'properties': { 'route': 'O' }, 'geometry': { 'type': 'LineString', 'coordinates': routeO.map(i => [i.lng, i.lat]) } },
@@ -262,9 +253,7 @@
                 'paint': { 'line-color': '#a0a0a0', 'line-width': 3, 'line-dasharray': [2, 2] }
             });
 
-            // ==========================================
-            // 功能二：畫出紅綠燈圓點（圓心看坡度，外框看路線）
-            // ==========================================
+            // 畫出普查節點
             const featuresPoints = rawData.map(item => {
                 return {
                     'type': 'Feature',
@@ -301,9 +290,7 @@
                 }
             });
 
-            // ==========================================
-            // 功能三：點擊圓點跳出 Mapbox Popup
-            // ==========================================
+            // 點擊節點彈出視窗
             map.on('click', 'nodes-layer', (e) => {
                 const coordinates = e.features[0].geometry.coordinates.slice();
                 const props = e.features[0].properties;
@@ -326,9 +313,14 @@
             map.on('mouseleave', 'nodes-layer', () => { map.getCanvas().style.cursor = ''; });
 
             // ==========================================
-            // 功能四：即時群眾路況回報機制
+            // 【關鍵修改】功能四：即時群眾路況回報機制（串接 Google Apps Script）
             // ==========================================
-            let tempMarker = null; let currentLngLat = null;
+            let tempMarker = null; 
+            let currentLngLat = null;
+            
+            // ⚠️ 請在此處換上您在 Google Apps Script 部署得到的 Web App 網址
+            const GAS_WEB_APP_URL = '請把你們在第一步複製的部署網址貼在這裡';
+
             map.on('click', (e) => {
                 const featuresAtPoint = map.queryRenderedFeatures(e.point, { layers: ['nodes-layer'] });
                 if (featuresAtPoint.length > 0) return; 
@@ -343,34 +335,71 @@
 
             document.getElementById('submit-report').addEventListener('click', () => {
                 const type = document.getElementById('obstacle-type').value;
-                if (tempMarker) tempMarker.remove();
-                
-                new mapboxgl.Marker({ color: '#d93838' })
-                    .setLngLat(currentLngLat)
-                    .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`
-                        <div style="font-family: sans-serif; padding: 3px; font-size:12px;">
-                            <h4 style="margin:0 0 4px 0; color:#d93838;">🚧 即時路況通報</h4>
-                            <b>狀態：</b>${type}
-                        </div>
-                    `))
-                    .addTo(map);
-                document.getElementById('report-box').style.display = 'none';
+                const reportId = "群眾回報_" + new Date().getTime(); 
+
+                if (!currentLngLat) return;
+
+                // 打包準備送往雲端試算表的資料包
+                const reportData = {
+                    id: reportId,
+                    lng: currentLngLat.lng,
+                    lat: currentLngLat.lat,
+                    type: type
+                };
+
+                // 優化按鈕反饋，防止重複點擊
+                const submitBtn = document.getElementById('submit-report');
+                submitBtn.innerText = "上傳雲端中...";
+                submitBtn.disabled = true;
+
+                // 核心傳輸邏輯：發送 POST 請求至 Google Apps Script 
+                fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // 繞過前端跨網域 CORS 安全阻擋
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reportData)
+                })
+                .then(() => {
+                    // 上傳成功：在地圖上渲染紅色危險地標
+                    if (tempMarker) tempMarker.remove();
+                    
+                    new mapboxgl.Marker({ color: '#d93838' })
+                        .setLngLat(currentLngLat)
+                        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`
+                            <div style="font-family: sans-serif; padding: 3px; font-size:12px;">
+                                <h4 style="margin:0 0 4px 0; color:#d93838;">🚧 即時路況通報(已連動雲端)</h4>
+                                <b>狀態：</b>${type}
+                            </div>
+                        `))
+                        .addTo(map);
+
+                    // 重設介面元素與按鈕
+                    submitBtn.innerText = "提交回報";
+                    submitBtn.disabled = false;
+                    document.getElementById('report-box').style.display = 'none';
+                    alert("回報成功！資料已同步寫入 Google 雲端共享試算表！");
+                })
+                .catch(err => {
+                    console.error("雲端連線失敗:", err);
+                    submitBtn.innerText = "提交回報";
+                    submitBtn.disabled = false;
+                    alert("上傳失敗，請確認網路連線或 GAS 權限設定。");
+                });
             });
         });
 
-        // ==========================================
-        // 功能五：將普查數據注入 AR 引擎
-        // ==========================================
+        // 將普查數據注入 AR 引擎
         document.addEventListener('DOMContentLoaded', () => {
             const arContainer = document.getElementById('ar-points-container');
             
             rawData.forEach(point => {
                 const textEntity = document.createElement('a-text');
                 textEntity.setAttribute('value', `[Route ${point.routeId}] ${point.id}\nStatus: ${point.type}\nSlope: ${point.slope}%`);
-                textEntity.setAttribute('gps-entity-place', `latitude: ${point.lat}; longitude: ${point.lng};`);
-                textEntity.setAttribute('scale', '15 15 15');
+                textEntity.setAttribute('gps-camera-place', `latitude: ${point.lat}; longitude: ${point.lng};`);
+                textEntity.setAttribute('scale', '25 25 25');
                 textEntity.setAttribute('look-at', '[gps-camera]');
                 textEntity.setAttribute('position', '0 3 0'); 
+                textEntity.setAttribute('align', 'center');
 
                 if (point.type === '階梯') textEntity.setAttribute('color', '#ff4d4d');
                 else if (point.slope > 8.33) textEntity.setAttribute('color', '#ff9900');
@@ -381,50 +410,30 @@
             });
         });
 
-        // ==========================================
-        // 【核心功能】翻轉相機：前置(自拍)鏡頭與後置鏡頭切換
-        // ==========================================
-        let currentFacingMode = 'environment'; // 預設為後置環境鏡頭
-
+        // 翻轉相機功能
+        let currentFacingMode = 'environment'; 
         function toggleCamera() {
-            // 切換 facingMode 參數
             currentFacingMode = (currentFacingMode === 'environment') ? 'user' : 'environment';
-            
-            // 抓取 A-Frame 控制 AR 鏡頭的元件與系統
             const sceneEl = document.querySelector('a-scene');
             const arToolkitSystem = sceneEl.systems['arjs'] || sceneEl.systems['artoolkit'];
 
             if (arToolkitSystem && arToolkitSystem.arToolkitContext) {
                 const source = arToolkitSystem.arToolkitContext.arToolkitSource;
-                
                 if (source && source.domElement && source.domElement.srcObject) {
-                    // 1. 停止目前鏡頭的影像串流，釋放硬體
                     const stream = source.domElement.srcObject;
-                    const tracks = stream.getTracks();
-                    tracks.forEach(track => track.stop());
+                    stream.getTracks().forEach(track => track.stop());
                     
-                    // 2. 重新向瀏覽器請求指定方向的相機權限 (user 代表前置自拍，environment 代表後置)
                     navigator.mediaDevices.getUserMedia({
-                        video: {
-                            facingMode: currentFacingMode,
-                            width: { ideal: 1280 },
-                            height: { ideal: 720 }
-                        }
+                        video: { facingMode: currentFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } }
                     }).then(newStream => {
-                        // 3. 將新的鏡頭串流餵回給 AR.js 的視訊標籤中
                         source.domElement.srcObject = newStream;
                         source.domElement.play();
                         
-                        // 更換按鈕提示圖案顏色作為反饋
                         const btn = document.getElementById('switch-camera-btn');
-                        if (currentFacingMode === 'user') {
-                            btn.style.backgroundColor = '#e533ff'; // 切換到自拍鏡頭時按鈕變紫色
-                        } else {
-                            btn.style.backgroundColor = 'rgba(0, 123, 255, 0.9)'; // 回到後置時恢復藍色
-                        }
+                        btn.style.backgroundColor = (currentFacingMode === 'user') ? '#e533ff' : 'rgba(0, 123, 255, 0.9)';
                     }).catch(err => {
-                        console.error("相機翻轉失敗: ", err);
-                        alert("無法成功切換鏡頭，請確認瀏覽器隱私權限設定。");
+                        console.error("鏡頭切換失敗: ", err);
+                        alert("無法成功切換鏡頭，請確認權限設定。");
                     });
                 }
             }
